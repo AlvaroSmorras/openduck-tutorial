@@ -51,4 +51,4 @@ $ cd 1_Chunking
 $ openduck chunk -y chunk_input.yaml
 ```
 
-![cdk2_chunk](./imgs/2r3k_chunk.png)
+![cdk2_chunk](./imgs/2r3k_chunk_10A.png)
