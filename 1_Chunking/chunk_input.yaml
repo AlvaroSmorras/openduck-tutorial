@@ -1,0 +1,12 @@
+# Example input yaml for openduck amber-prepare. For an extended explanation of the arguments, consult openduck amber-prepare -h.
+# Main arguments
+interaction : A_LEU_83_N
+receptor_pdb : 2r3k_receptor.pdb
+ligand_mol : 2r3k_lig.mol
+output : 2r3k_chunk.pdb
+
+# Chunking arguments
+cutoff : 11
+ignore_buffers : False
+
+
