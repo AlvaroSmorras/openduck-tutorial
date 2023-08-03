@@ -31,8 +31,8 @@ To run Dynamic Undocking we only need a protein receptor and one or more ligands
 In this tutorial we will work with the Cyclin Dependant Kinase 2 (CDK2) and an inhibitor, both from the [2R3K](https://www.ebi.ac.uk/pdbe/entry/pdb/2r3k) structure from the PDB. As you can see in the image below, the kinase inhibitor is in a region called the 'hinge', between the beta-sheets and alpha-helixes domains. 
 
 <p float='middle'>
-<img src="./imgs/2r3k_pdb.png" width="50%" height="50%">
-<img src="./imgs/ligand_HB.png" width="50%" height="50%">
+<img src="./imgs/2r3k_pdb.png" width="45%" height="45%">
+<img src="./imgs/ligand_HB.png" width="45%" height="45%">
 </p>
 
 ### 1_Chunking
