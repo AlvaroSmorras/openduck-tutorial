@@ -28,12 +28,13 @@ To run Dynamic Undocking we only need a protein receptor and one or more ligands
 
 ## System preparation
 
-In this tutorial we will work with the Cyclin Dependant Kinase 2 (CDK2) and an inhibitor, both from the [2R3K](https://www.ebi.ac.uk/pdbe/entry/pdb/2r3k) structure from the PDB. As you can see in the image below, the kinase inhibitor is in a region called the 'hinge', between the beta-sheets and alpha-helixes domains. 
+In this tutorial we will work with the Cyclin Dependant Kinase 2 (CDK2) and an inhibitor (SCQ), both from the [2R3K](https://www.ebi.ac.uk/pdbe/entry/pdb/2r3k) structure from the PDB. As seen in the image below, the kinase inhibitor is in a region called the 'hinge', between the beta-sheets and alpha-helixes domains. The inhibitor is interacting with the hinge loop through two hydrogen bonds (HB). Both HB are being performed with the leucine 83 backbone. Through the tutorial we will learn how to prepare and launch Dynamic Undocking to obtain the $W_{QB}$ of the inhibitor SCQ bound to CDK2.  
 
 <p float='middle'>
-<img src="./imgs/2r3k_pdb.png" width="45%" height="45%">
+<img src="./imgs/2r3k_pdb.png" width="50%" height="50%">
 <img src="./imgs/ligand_HB.png" width="45%" height="45%">
 </p>
+
 
 ### 1_Chunking
 
@@ -41,17 +42,79 @@ Dynamic Undocking's main descriptor, the quasi-bond work ($W_{QB}$), is a local 
 
 Chunking is integrated in all of the openduck preparation ( openMM-full-protocol, openMM-prepare and amber-prepare ) however, it also has a standalone subcommand. While chunking can be done within the pipeline, we recommend doing separatedly beforehand in order to check the chunk representation of the receptor and to ensure it is the most appropiate.
 
-The optimal chunk has to fulfill the following conditions:
+An *adecuated chunk* has to fulfill the following conditions:
 
     - All residues directly interacting with the ligand
     - No artificial gaps in the pocket close to the hydrogen bond (water shielding is one of the most important ligands have on $W_{QB}$)
     - Available ligand exit pathway (only relevant for enclosed pockets)
 
+We will use one of the two HB between the ligand and receptor mentioned above to create the chunk around. The tutorial has been set to employ configuration files (.yaml), however, a more *classical* flag-based execution is also possible. You can find template input yamls for every subprocess in the openduck files
+To create the receptor chunk we only need the receptor and ligand files, the desired interaction we will use to launch DUck and a cutoff radius.
 
+In our case, everything is specified in the configuration file *chunk_input.yaml*
+
+``` {yaml}
+# chunk_input.yaml
+# Main arguments
+interaction : A_LEU_83_N
+receptor_pdb : 2r3k_receptor.pdb
+ligand_mol : 2r3k_lig.mol
+output : 2r3k_chunk.pdb
+
+# Chunking arguments
+cutoff : 11
+ignore_buffers : False
+```
+
+To launch it, we need to activate the openduck conda environment, enter the directory and execute the chunking protocol we specified in the yaml.
 ```
 $ conda activate openduck
 $ cd 1_Chunking
 $ openduck chunk -y chunk_input.yaml
 ```
 
+You can open the chunked receptor with your prefered visualization program to check if it has the conditions we mentioned above. As the receptor is being 'cut' to reduce the atoms, each segment needs to be capped. Check that all the segments are properly capped in the resulting receptor.
+If the receptor does not fulfil the conditions of an *adecuated chunk*, you can adjust the cutoff threshold at will.
+
 ![cdk2_chunk](./imgs/2r3k_chunk_10A.png)
+
+## 2_Parametrization
+
+Now that we have a chunk we can proceed to parametrize the ligand, chunk and solvation. In the openduck executable this step is separated depending on the executable one wants to use afterwards, either Amber or openMM. However, the parametrization is done equally in both executions. Both *openmm-prepare* and *amber-prepare* have incorporated the chunking step, where you can use the appropiate parameters found during the previous step. Alternatively you can use the already chunked receptor but, remember checking the new interaction definition as during the chunking, the receptor residues might change numbering.
+
+For the preparation we have a plethora of options regarding forcefields, the periodic box parameters and other execution options such as hydrogen mass repartitioning (HMR). To know more about the options you can run the *openduck amber-prepare* or the *openduck openmm-prepare* with the help flag.
+
+The preparation has the following configuration file:
+```
+# amber-prepare input.yaml
+
+# Main arguments
+interaction : _LEU_31_N
+receptor_pdb : 2r3k_chunk.pdb
+ligand_mol : 2r3k_lig.mol
+
+# Chunk
+do_chunk : False
+
+# Preparation
+small_molecule_forcefield : gaff2
+protein_forcefield : amber14-all
+water_model : TIP3P
+ionic_strength : 0.1
+solvent_buffer_distance : 10
+HMR : True
+
+# Production arguments for amber queue and inputs
+smd_cycles : 10
+wqb_threshold : 6
+queue_template : Slurm
+```
+
+We have chosen to prepare the solvation box with TIP3P waters, in a square box with 10A of buffer distance between the limits of the protein and the end of the box and a ionic strength of 0.1M. The chunk and ligand will be parametrized using the amber14SB and GAFF2 respectively. 
+As we are going to use Amber for the DUck execution we will need to specify additional parameters. *Smd_cycles* defines the amount of iterations will the protocol run for, iterations resulting in a $W_{QB}$ lower than *Wqb_threshold* will halt the execution. The execution will be using 4 fs steps and *HMR* will be performed on the topology. Finally, a *slurm* queue file with the DUck commands for amber is generated. You can define new templates in the openduck files for your HPC facilities, if none is specified, the commands will be put into a bash script for local execution.
+
+```
+cd 2_Parametrization
+openduck amber-prepare -y amber-prep_input_single_mol.yaml
+```
+

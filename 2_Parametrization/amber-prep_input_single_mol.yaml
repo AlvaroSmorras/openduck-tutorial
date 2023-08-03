@@ -1,0 +1,27 @@
+# Example input yaml for openduck amber-prepare. For an extended explanation of the arguments, consult openduck amber-prepare -h.
+# Main arguments
+interaction : _LEU_31_N
+receptor_pdb : 2r3k_chunk.pdb
+ligand_mol : 2r3k_lig.mol
+
+# Chunk
+do_chunk : False
+cutoff : 10
+ignore_buffers : False
+
+# Preparation
+small_molecule_forcefield : gaff2
+protein_forcefield : amber14-all
+#waters_to_retain : waters_to_retain.pdb
+water_model : TIP3P
+ionic_strength : 0.1
+solvent_buffer_distance : 10
+HMR : True
+fix_ligand : True
+
+# Production arguments for amber queue and inputs
+smd_cycles : 10
+wqb_threshold : 6
+queue_template : Slurm
+seed : -1
+keep_all_files : False
