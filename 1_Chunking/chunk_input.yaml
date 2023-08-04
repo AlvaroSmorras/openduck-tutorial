@@ -1,4 +1,4 @@
-# Example input yaml for openduck amber-prepare. For an extended explanation of the arguments, consult openduck amber-prepare -h.
+# Example input yaml for openduck chunk. For an extended explanation of the arguments, consult openduck chunk -h.
 # Main arguments
 interaction : A_LEU_83_N
 receptor_pdb : 2r3k_receptor.pdb

@@ -76,7 +76,7 @@ $ openduck chunk -y chunk_input.yaml
 You can open the chunked receptor with your prefered visualization program to check if it has the conditions we mentioned above. As the receptor is being 'cut' to reduce the atoms, each segment needs to be capped. Check that all the segments are properly capped in the resulting receptor.
 If the receptor does not fulfil the conditions of an *adecuated chunk*, you can adjust the cutoff threshold at will.
 
-![cdk2_chunk](./imgs/2r3k_chunk_10A.png)
+<img src="./imgs/2r3k_chunk_10A.png" width="60%" height="60%">
 
 ## 2_Parametrization
 
@@ -111,10 +111,13 @@ queue_template : Slurm
 ```
 
 We have chosen to prepare the solvation box with TIP3P waters, in a square box with 10A of buffer distance between the limits of the protein and the end of the box and a ionic strength of 0.1M. The chunk and ligand will be parametrized using the amber14SB and GAFF2 respectively. 
-As we are going to use Amber for the DUck execution we will need to specify additional parameters. *Smd_cycles* defines the amount of iterations will the protocol run for, iterations resulting in a $W_{QB}$ lower than *Wqb_threshold* will halt the execution. The execution will be using 4 fs steps and *HMR* will be performed on the topology. Finally, a *slurm* queue file with the DUck commands for amber is generated. You can define new templates in the openduck files for your HPC facilities, if none is specified, the commands will be put into a bash script for local execution.
+As we are going to use Amber for the DUck execution we will need to specify additional parameters. *Smd_cycles* defines the amount of iterations will the protocol run for, iterations resulting in a $W_{QB}$ lower than *Wqb_threshold* will halt the execution. *HMR* will be performed on the topology to allow a 4 fs timestep. Finally, a *slurm* queue file with the DUck commands for amber is generated. You can define new templates in the openduck files for your HPC facilities, if none (or *local*) is specified, the DUck protocol in amber will be writen into a bash script for local execution.
 
 ```
 cd 2_Parametrization
 openduck amber-prepare -y amber-prep_input_single_mol.yaml
 ```
 
+We now have the directory filled with different files, from the amber input files (*.in, dist_duck.rst & dist_md.rst), the topology & initial coordinates ([HMR_]system_complex.prmtop & system_complex.inpcrd) to the queue file (duck_queue.q). This will be all the necessary files to launch the production,but first lets have a look at the solvated system we will simulate. 
+
+<img src="./imgs/2r3k_chunk_solvated.png" width="60%" height="60%">
