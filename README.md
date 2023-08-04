@@ -36,7 +36,7 @@ In this tutorial we will work with the Cyclin Dependant Kinase 2 (CDK2) and an i
 </p>
 
 
-### 1_Chunking
+### 1 Chunking
 
 Dynamic Undocking's main descriptor, the quasi-bond work ($W_{QB}$), is a local measurement of the stability of the protein-ligand complex. This lets us reduce the receptor to the minimum residues to preserve the ligand's environment and to quicken the simulations. This proces we call chunking.
 
@@ -76,9 +76,11 @@ $ openduck chunk -y chunk_input.yaml
 You can open the chunked receptor with your prefered visualization program to check if it has the conditions we mentioned above. As the receptor is being 'cut' to reduce the atoms, each segment needs to be capped. Check that all the segments are properly capped in the resulting receptor.
 If the receptor does not fulfil the conditions of an *adecuated chunk*, you can adjust the cutoff threshold at will.
 
+<p float='middle'>
 <img src="./imgs/2r3k_chunk_10A.png" width="60%" height="60%">
+</p>
 
-## 2_Parametrization
+## 2 [Parametrization]
 
 Now that we have a chunk we can proceed to parametrize the ligand, chunk and solvation. In the openduck executable this step is separated depending on the executable one wants to use afterwards, either Amber or openMM. However, the parametrization is done equally in both executions. Both *openmm-prepare* and *amber-prepare* have incorporated the chunking step, where you can use the appropiate parameters found during the previous step. Alternatively you can use the already chunked receptor but, remember checking the new interaction definition as during the chunking, the receptor residues might change numbering.
 
@@ -118,6 +120,14 @@ cd 2_Parametrization
 openduck amber-prepare -y amber-prep_input_single_mol.yaml
 ```
 
-We now have the directory filled with different files, from the amber input files (*.in, dist_duck.rst & dist_md.rst), the topology & initial coordinates ([HMR_]system_complex.prmtop & system_complex.inpcrd) to the queue file (duck_queue.q). This will be all the necessary files to launch the production,but first lets have a look at the solvated system we will simulate. 
+We now have the directory filled with different files, from the amber input files (\*.in, dist_duck.rst & dist_md.rst), the topology & initial coordinates (HMR_system_complex.prmtop & system_complex.inpcrd) to the queue file (*duck_queue.q*). This will be all the necessary files to launch the production,but first lets have a look at the solvated system we will simulate. 
 
+<p float='middle'>
 <img src="./imgs/2r3k_chunk_solvated.png" width="60%" height="60%">
+</p>
+
+### 2a Parametrizing Multiple ligands
+
+DUck was initially designed as a post-docking filter for high-througput virtual screening (HTVS) campaigns. As such, the single protein-ligand parametrization explained in the [#parametrization] 
+
+## Production
