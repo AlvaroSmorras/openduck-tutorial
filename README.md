@@ -153,21 +153,53 @@ The ligand is free to explore different conformations during the equilibration a
 
 ## 4 Analysis
 
-There are various ways of analyzing the results. The most quick and straightforward is using the min $W_{QB}$, as it represents the most probable pathway being the least resistant. 
+There are various ways of analyzing the results. The most quick and straightforward is using the min $W_{QB}$, as it represents the most probable pathway being the least resistant. The $W_{QB}$ of each replica is usually reflected at the last step of the simulation. However, this is not always the case so it needs to be recovered from the maximum work after the minima at ~3$\AA$. A more thorough approach is obtaining the quasi-bond free energy $\Delta G_{QB}$ by applying the Jarzynski equality (JE).
 
 <p align='center'>
-<img src="./imgs/wqb_dqb_schema.png">
+<img src="./imgs/wqb_dqb_schema.png" width="80%">
 </p>
 
-However, a more thorough approach is obtaining the quasi-bond free energy $\Delta F_{QB}$ by applying the Jarzynski equality (JE).
-
-$$e^{{-\Delta F}/{kT}} = \overline{e^{-W/kT}}$$
 
 The JE is a particular case of the fluctuation-dissipation theorem. In a non-equilibrium simulation, transition between a two states (in our case between the bound and quasi-bound state) dissipates energy, turning it into heat (i.e. friction).This friction increases the faster the process goes, and is 0 when the process is infinitely slow. In this particular case, the work (*W*) needed for the process equates the free energy.
 
 $$\Delta F = W - W_{diss} $$ 
 
-Through the JE we relate the quasi-bond free energy with the Boltzmann average of the works obtained during out SMD simulations.
+Through the JE we relate the quasi-bond free energy with the Boltzmann average of the works obtained during out SMD simulations.Normally, the more production cycles, the more accurate is the $\Delta G_{QB}$. This however, can be solved by artificially subsampling the simulations through bootstrapping, for example.
 
-$$\Delta G_{QB} = -k_{B}Tln( \frac{1}{M}\sum^{M}_{i=1}{exp({-W_{i}}/{k_{B}T})}$$
+$$e^{{-\Delta F}/{kT}} = \overline{e^{-W/kT}}$$
+
+$$\Delta G_{QB} = -kTln( M^{-1} \sum_{i=1}^{M}{exp({-W_{i}}/{kT})}$$
+
+### 4a Analysis of a single ligand
+
+With the simulations we produced in the [previous section](#3-production) we will analyze the structural stability of our protein-ligand complex. First, with a simple command, we will calculate and plot the $W_{QB}$. We will specify the flag *-d* to change the output to yield an average and standart deviation (SD) of the $W_{QB}$ and the *--plot* to obtain a graphical representation of work during the simulations. 
+
+```{bash}
+$ cd 4_Analysis
+$ openduck report -d avg --plot
+$ eog wqb_plot.png 
+```
+|System	|WQB	|Average	|SD|
+|-|-|-|-|
+|.|	7.268099999999999	|8.186807272727272	|0.409612311140689|
+As you can see, the $W_{QB}$ is 7.268 and the simulations present a very small hysteresis. This is good and shows the ligand has a stable binding mode (low *SD*) and a robust interaction with the receptor (high $W_{QB}$). 
+
+<p align='center'>
+<img src="./4_Analysis/wqb_plot.png" width="70%">
+</p>
+
+ Take notice, that the average in this table does not correspond with the $\Delta G_{QB}$, as it is a arithmetic average and not an Boltzmann average. To calculate the jarzynski free energy we can invoke the report command with *jarzynski* in the *-d* flag.
+
+ ```{bash}
+ $ openduck report -d jarzynski
+ ```
+|System	|Jarzynski	|Jarzynski_SD	|Jarzynski_SEM|
+|-|-|-|-|
+|.|	8.0316067705202	|0.10848616866492665|0.017371689901702|
+<p align='center'>
+<img src="./4_Analysis/bootstraped_WQB_plot.png" width="70%">
+</p>
+
+### 4b Highthroughput analysis of multiple ligands
+
 
