@@ -140,17 +140,34 @@ $ openduck amber-prepare -y amber-prep_input_multiple-ligands.yaml
 ## 3 Production
 
 Once the system is prepared, we only need to run the simulations in you prefered machine.
-The Amber commands are setup to use pmemd.cuda, which uses GPU, but in openMM we have the option to employ either CPU or GPU. Take into account that the CPU execution will be much slower. For the purpose of this tutorial, the DUck results have been precomputed.
+The Amber commands are setup to use pmemd.cuda, which uses GPU, but in openMM we have the option to employ either CPU or GPU. Take into account that the CPU execution will be much slower. For the purpose of this tutorial, the DUck results have been precomputed and are stored in the *3_Production* directory.
 
 The DUck pipeline has the following structure:
 
- 1. Minimization + Heating + Equilibration
- 2. Production cycle (from 0 to _**smd_cycles**_)
-    2.1. MD (0.5 $\mu$s)
-    2.2 SMD@300K & SMD@325K (0.5 $\mu$s each)
-    2.3 Check if $W_{QB}$ >= _**wqb_threshold**_. Continue to next production cycle if *true*; else stop execution
+<p align='center'>
+<img src="./imgs/duck_pipeline.png">
+</p>
+
  
-The ligand is free to explore different conformations during the equilibration and MD phase, while the receptor is restrained. The two SMD steps at different temperatures bring the specified hydrogen bond from 2.5$\AA$ to 5.0$\AA$ at a constant speed of $5\AA/\mu s$. Each SMD simulation is stored in a directory named DUCK_n or DUCK_325K_n depending on the temperature and production cycle is it. The force and work values extracted from it are stored in the duck.dat file of such directories.
+The ligand is free to explore different conformations during the equilibration and MD phase, while the receptor is restrained. The two SMD steps at different temperatures bring the specified hydrogen bond from 2.5$\AA$ to 5.0$\AA$ at a constant speed of $5\AA/\mu s$. Each SMD simulation is stored in a directory named DUCK_n or DUCK_325K_n depending on the temperature and production cycle is it. The force and work values extracted from it are stored in the duck.dat file of such directories. Production iterations are stopped prematurely if the $W_{QB}$ does not reach the specified *wqb_threshold* after each SMD.
 
 ## 4 Analysis
+
+There are various ways of analyzing the results. The most quick and straightforward is using the min $W_{QB}$, as it represents the most probable pathway being the least resistant. 
+
+<p align='center'>
+<img src="./imgs/wqb_dqb_schema.png">
+</p>
+
+However, a more thorough approach is obtaining the quasi-bond free energy $\Delta F_{QB}$ by applying the Jarzynski equality (JE).
+
+$$e^{{-\Delta F}/{kT}} = \overline{e^{-W/kT}}$$
+
+The JE is a particular case of the fluctuation-dissipation theorem. In a non-equilibrium simulation, transition between a two states (in our case between the bound and quasi-bound state) dissipates energy, turning it into heat (i.e. friction).This friction increases the faster the process goes, and is 0 when the process is infinitely slow. In this particular case, the work (*W*) needed for the process equates the free energy.
+
+$$\Delta F = W - W_{diss} $$ 
+
+Through the JE we relate the quasi-bond free energy with the Boltzmann average of the works obtained during out SMD simulations.
+
+$$\Delta G_{QB} = -k_{B}Tln( \frac{1}{M}\sum^{M}_{i=1}{exp({-W_{i}}/{k_{B}T})}$$
 
