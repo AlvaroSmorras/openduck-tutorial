@@ -1,6 +1,6 @@
 # Welcome to the Openduck tutorial
 
-Openduck is an opensource version of Dynamic Undocking, a particular implementation of steered molecular dynamics ment to assess the robustness of protein-ligand complexes through the work needed to bring the main hydrogen bond interaction to the quasi-bound state.
+Openduck is an opensource version of Dynamic Undocking, a particular implementation of steered molecular dynamics (SMD) ment to assess the robustness of protein-ligand complexes through the work needed to bring the main hydrogen bond interaction to the quasi-bound state.
 
 ## Getting started
 
@@ -141,6 +141,16 @@ $ openduck amber-prepare -y amber-prep_input_multiple-ligands.yaml
 
 Once the system is prepared, we only need to run the simulations in you prefered machine.
 The Amber commands are setup to use pmemd.cuda, which uses GPU, but in openMM we have the option to employ either CPU or GPU. Take into account that the CPU execution will be much slower. For the purpose of this tutorial, the DUck results have been precomputed.
+
+The DUck pipeline has the following structure:
+
+ 1. Minimization + Heating + Equilibration
+ 2. Production cycle (from 0 to _**smd_cycles**_)
+    2.1. MD (0.5 $\mu$s)
+    2.2 SMD@300K & SMD@325K (0.5 $\mu$s each)
+    2.3 Check if $W_{QB}$ >= _**wqb_threshold**_. Continue to next production cycle if *true*; else stop execution
+ 
+The ligand is free to explore different conformations during the equilibration and MD phase, while the receptor is restrained. The two SMD steps at different temperatures bring the specified hydrogen bond from 2.5$\AA$ to 5.0$\AA$ at a constant speed of $5\AA/\mu s$. Each SMD simulation is stored in a directory named DUCK_n or DUCK_325K_n depending on the temperature and production cycle is it. The force and work values extracted from it are stored in the duck.dat file of such directories.
 
 ## 4 Analysis
 

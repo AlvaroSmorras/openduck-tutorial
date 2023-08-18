@@ -1,0 +1,1 @@
+../2_Parametrization/dist_duck.rst

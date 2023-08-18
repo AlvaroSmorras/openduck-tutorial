@@ -1,0 +1,1 @@
+../2_Parametrization/3_eq.rst

@@ -1,0 +1,1 @@
+../2_Parametrization/min.rst
