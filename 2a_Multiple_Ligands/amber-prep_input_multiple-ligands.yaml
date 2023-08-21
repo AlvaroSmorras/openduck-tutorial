@@ -1,13 +1,11 @@
 # Example input yaml for openduck amber-prepare. For an extended explanation of the arguments, consult openduck amber-prepare -h.
 # Main arguments
-interaction : A_LEU_83_N
-receptor_pdb : 2r3k_receptor.pdb
+interaction : _LEU_31_N
+receptor_pdb : 2r3k_chunk.pdb
 ligand_mol : CDK2_ligands.sdf
 
 # Chunk
-do_chunk : True
-cutoff : 10
-ignore_buffers : False
+do_chunk : False
 
 # Preparation
 small_molecule_forcefield : gaff2
@@ -28,3 +26,4 @@ seed : -1
 # Batch execution
 batch : True
 threads : 12
+prefix : LIG_target

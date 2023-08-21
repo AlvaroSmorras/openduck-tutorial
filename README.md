@@ -26,7 +26,7 @@ $ cd openduck-tutorial
 ```
 To run Dynamic Undocking we only need a protein receptor and one or more ligands. In these tutorials, we will use ligands and proteins available in the pdb and configuration files in yaml format.
 
-## System preparation
+## Single ligand evaluation
 
 In this tutorial we will work with the Cyclin Dependant Kinase 2 (CDK2) and an inhibitor (SCQ), both from the [2R3K](https://www.ebi.ac.uk/pdbe/entry/pdb/2r3k) structure from the PDB. As seen in the image below, the kinase inhibitor is in a region called the 'hinge', between the beta-sheets and alpha-helixes domains. The inhibitor is interacting with the hinge loop through two hydrogen bonds (HB). Both HB are being performed with the leucine 83 backbone. Through the tutorial we will learn how to prepare and launch Dynamic Undocking to obtain the $W_{QB}$ of the inhibitor SCQ bound to CDK2.  
 
@@ -126,17 +126,6 @@ We now have the directory filled with different files, from the Amber input file
 <img src="./imgs/2r3k_chunk_solvated.png" width="60%" height="60%">
 </p>
 
-### 2a Parameterizing multiple ligands
-
-DUck was initially designed as a post-docking filter for high-througput virtual screening (HTVS) campaigns. As such, the single protein-ligand parametrization explained in the [parametrization](#2-parametrization) section is not practical when the amount of ligands to assess grow. For this reason, there is a *batch* execution for the preparation, which takes a multiligand sdf instead of a single mol and paralelizes the parametrization through the specified amount of *threads*.
-
-The files generated will be the same as for the single ligand, albeit separated in subfolders named LIG_target_1, LIG_target_2 [..] LIG_target_n.
-
-```
-$ cd 2a_Multiple_Ligands
-$ openduck amber-prepare -y amber-prep_input_multiple-ligands.yaml
-```
-
 ## 3 Production
 
 Once the system is prepared, we only need to run the simulations in you prefered machine.
@@ -182,6 +171,7 @@ $ eog wqb_plot.png
 |System	|WQB	|Average	|SD|
 |-|-|-|-|
 |.|	7.268099999999999	|8.186807272727272	|0.409612311140689|
+
 As you can see, the $W_{QB}$ is 7.268 and the simulations present a very small hysteresis. This is good and shows the ligand has a stable binding mode (low *SD*) and a robust interaction with the receptor (high $W_{QB}$). 
 
 <p align='center'>
@@ -200,6 +190,81 @@ As you can see, the $W_{QB}$ is 7.268 and the simulations present a very small h
 <img src="./4_Analysis/bootstraped_WQB_plot.png" width="70%">
 </p>
 
-### 4b Highthroughput analysis of multiple ligands
+---
+
+## OpenDuck protocol for multiple ligands
+
+DUck was initially designed as a post-docking filter for high-througput virtual screening (HTVS) campaigns. The throughput of DUck depends mainly on the size of the system, the number of iterations and how high is the $W_{QB}$ threshold. For a typical campaign the recomended $W_{QB}$ threshold is 6 $kcal·mol^{-1}$ within 5 iterations. This will ensure a fast selection of the docking results with the most robust interaction. DUck can also be used to distinguish between analogs in optimization campaigns. 
 
 
+Given that the HTVS protocol will yield more than one molecule, the single protein-ligand parametrization detailed in the [parametrization](#2-parametrization) needs to be scaled. With that objective, a *batch* execution for the preparation can be flagged, which takes a multiligand sdf instead of a single mol and paralelizes the parametrization through the specified amount of *threads*. The files generated will be the same as for the single ligand, albeit separated in subfolders named LIG_target_1, LIG_target_2 [..] LIG_target_n by default. The prefix *LIG_target* can be modified in the configuration yaml. Finally, the queueing templates we use for HTVS rely on array execution of DUck. Thus, an appropiate queue file will be generated for the specified template (*duck_array_queue.q*). 
+
+For this tutorial, we will continue using the CDK2 - inhibitors system (and reusing the chunk we created in the [chunking section](#1-chunking)). We will use the 2R3K ligand as well as 11 analogs from the same paper.
+
+<p align='center'>
+<img src="./imgs/CDK2_ligands.png" width="70%">
+</p>
+
+For our example, we will keep the parametrization parameters as with the single molecule, but adding the arguments for the batch processing.
+
+```{yaml}
+# amber-prep_input_multiple-ligands.yaml
+# Main arguments
+interaction : _LEU_31_N
+receptor_pdb : 2r3k_chunk.pdb
+ligand_mol : 2r3k_ligands.sdf
+
+# Chunk
+do_chunk : False
+
+# Preparation
+small_molecule_forcefield : gaff2
+protein_forcefield : amber14-all
+water_model : TIP3P
+ionic_strength : 0.1
+solvent_buffer_distance : 10
+HMR : True
+
+# Production arguments for amber queue and inputs
+smd_cycles : 10
+wqb_threshold : 6
+queue_template : Slurm
+
+# Batch preparation
+batch : True
+threads : 12
+prefix : LIG_target
+```
+
+Check the available threads in your machine before launching the command below, as we specified 12 threads. If you have less avaiable, reduce the number. This will increase slightly the preparation time, however under normal conditions it will take aproximately the same time. Now lets prepare and launch the simulations.
+
+```
+$ cd 2a_Multiple_Ligands
+$ openduck amber-prepare -y amber-prep_input_multiple-ligands.yaml
+$ sbatch duck_array_queue.q
+``` 
+
+The precomputed work trajectories are available in the *./2a_Multiple_Ligands/precomputed_results/* directory. To help the management of large number of ligands, we can generate the openduck report through a glob extension using wildcards. This will generate a tabulated file, which we can order and filter appropiatedly to extract the most promissing ligands. The output format can be changed to sdf where the $W_{QB}$ or *Jarzynski* will be added to each ligand as a property.
+
+```{bash}
+$ cd precomputed_results
+$ openduck report -p'LIG_target_*' --plot
+```
+<div align="center">
+
+|System|WQB|
+|-|-|
+|LIG_target_1|2.99957|
+|LIG_target_2|5.83867|
+|LIG_target_3|7.34395|
+|LIG_target_4|3.77131|
+|LIG_target_5|6.28546|
+|LIG_target_6|8.11142|
+|LIG_target_7|5.69691|
+|LIG_target_8|6.34259|
+|LIG_target_9|7.89207|
+|LIG_target_10|5.5053|
+|LIG_target_11|8.13896|
+|LIG_target_12|5.84042|
+
+</div>
