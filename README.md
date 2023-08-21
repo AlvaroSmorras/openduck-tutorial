@@ -250,7 +250,6 @@ The precomputed work trajectories are available in the *./2a_Multiple_Ligands/pr
 $ cd precomputed_results
 $ openduck report -p'LIG_target_*' --plot
 ```
-<div align="center">
 
 |System|WQB|
 |-|-|
@@ -266,5 +265,3 @@ $ openduck report -p'LIG_target_*' --plot
 |LIG_target_10|5.5053|
 |LIG_target_11|8.13896|
 |LIG_target_12|5.84042|
-
-</div>
