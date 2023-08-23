@@ -169,7 +169,7 @@ $ openduck report -d avg --plot
 $ eog wqb_plot.png 
 ```
 |System	|WQB	|Average	|SD|
-|-|-|-|-|
+|:-:|:-:|:-:|:-:|
 |.|	7.268099999999999	|8.186807272727272	|0.409612311140689|
 
 As you can see, the $W_{QB}$ is 7.268 and the simulations present a very small hysteresis. This is good and shows the ligand has a stable binding mode (low *SD*) and a robust interaction with the receptor (high $W_{QB}$). 
@@ -184,7 +184,7 @@ As you can see, the $W_{QB}$ is 7.268 and the simulations present a very small h
  $ openduck report -d jarzynski
  ```
 |System	|Jarzynski	|Jarzynski_SD	|Jarzynski_SEM|
-|-|-|-|-|
+|:-:|:-:|:-:|:-:|
 |.|	8.0316067705202	|0.10848616866492665|0.017371689901702|
 <p align='center'>
 <img src="./4_Analysis/bootstraped_WQB_plot.png" width="70%">
@@ -239,7 +239,7 @@ prefix : LIG_target
 Check the available threads in your machine before launching the command below, as we specified 12 threads. If you have less avaiable, reduce the number. This will increase slightly the preparation time, however under normal conditions it will take aproximately the same time. Now lets prepare and launch the simulations.
 
 ```
-$ cd 2a_Multiple_Ligands
+$ cd Multiple_Ligands
 $ openduck amber-prepare -y amber-prep_input_multiple-ligands.yaml
 $ sbatch duck_array_queue.q
 ``` 
@@ -248,20 +248,30 @@ The precomputed work trajectories are available in the *./2a_Multiple_Ligands/pr
 
 ```{bash}
 $ cd precomputed_results
-$ openduck report -p'LIG_target_*' --plot
+$ openduck report -p'LIG_target_*' -d avg --plot
 ```
 
-|System|WQB|
-|-|-|
-|LIG_target_1|2.99957|
-|LIG_target_2|5.83867|
-|LIG_target_3|7.34395|
-|LIG_target_4|3.77131|
-|LIG_target_5|6.28546|
-|LIG_target_6|8.11142|
-|LIG_target_7|5.69691|
-|LIG_target_8|6.34259|
-|LIG_target_9|7.89207|
-|LIG_target_10|5.5053|
-|LIG_target_11|8.13896|
-|LIG_target_12|5.84042|
+|System|WQB|Average|SD|PDB ID|
+|:-:|:-:|:-:|:-:|:-:|
+|LIG_target_1|2.99957|3.9361955|0.4206654|2R3F|
+|LIG_target_2|5.83867|7.1745523|0.5922180|2R3H|
+|LIG_target_3|7.34395|8.5866051|0.6106118|2R3I|
+|LIG_target_4|3.77131|5.6207386|0.6275718|2R3J|
+|LIG_target_5|6.28546|7.0258614|0.3429595|2R3K|
+|LIG_target_6|8.11142|8.79594  |0.348290967|2R3L|
+|LIG_target_7|5.69691|5.996315 |0.1937219|2R3M|
+|LIG_target_8|6.34259|8.046424 |0.81989499|2R3N|
+|LIG_target_9|7.89207|8.7339086|0.48151898|2R3O|
+|LIG_target_10|5.5053|6.5545427|0.4343511|2R3P|
+|LIG_target_11|8.1386|10.5342214|0.876280|2R3Q|
+|LIG_target_12|5.84042|6.263376|0.2634303|2R3R|
+
+
+
+
+
+
+
+
+
+
