@@ -138,11 +138,11 @@ The DUck pipeline has the following structure:
 </p>
 
  
-The ligand is free to explore different conformations during the equilibration and MD phase, while the receptor is restrained. The two SMD steps at different temperatures bring the specified hydrogen bond from 2.5$\AA$ to 5.0$\AA$ at a constant speed of $5\AA/\mu s$. Each SMD simulation is stored in a directory named DUCK_n or DUCK_325K_n depending on the temperature and production cycle is it. The force and work values extracted from it are stored in the duck.dat file of such directories. Production iterations are stopped prematurely if the $W_{QB}$ does not reach the specified *wqb_threshold* after each SMD.
+The ligand is free to explore different conformations during the equilibration and MD phase, while the receptor is restrained. The two SMD steps at different temperatures bring the specified hydrogen bond from 2.5 &#8491; to 5.0 &#8491; at a constant speed of 5 &#8491; $/ \mu s$. Each SMD simulation is stored in a directory named DUCK_n or DUCK_325K_n depending on the temperature and production cycle is it. The force and work values extracted from it are stored in the duck.dat file of such directories. Production iterations are stopped prematurely if the $W_{QB}$ does not reach the specified *wqb_threshold* after each SMD.
 
 ## 4 Analysis
 
-There are various ways of analyzing the results. The most quick and straightforward is using the min $W_{QB}$, as it represents the most probable pathway being the least resistant. The $W_{QB}$ of each replica is usually reflected at the last step of the simulation. However, this is not always the case so it needs to be recovered from the maximum work after the minima at ~3$\AA$. A more thorough approach is obtaining the quasi-bond free energy $\Delta G_{QB}$ by applying the Jarzynski equality (JE).
+There are various ways of analyzing the results. The most quick and straightforward is using the min $W_{QB}$, as it represents the most probable pathway being the least resistant. The $W_{QB}$ of each replica is usually reflected at the last step of the simulation. However, this is not always the case so it needs to be recovered from the maximum work after the minima at ~3 &#8491;. A more thorough approach is obtaining the quasi-bond free energy $\Delta G_{QB}$ by applying the Jarzynski equality (JE).
 
 <p align='center'>
 <img src="./imgs/wqb_dqb_schema.png" width="80%">
